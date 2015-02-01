@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<head>
+    <style>
+        body {
+            font: 10px sans-serif;
+        }
+
+        .axis path,
+        .axis line {
+            fill: none;
+            stroke: #000;
+        /*shape-rendering: crispEdges;*/
+        }
+
+        .x.axis path {
+            display: none
+        }
+
+        .line {
+            fill: none;
+            stroke: steelblue;
+            stroke-width: 1.5px;
+        }
+        .lines{
+            display: none;
+        }
+        #buttonArea{
+            width: 200px;
+            height: 500px;
+            position: absolute;
+            left: 1000px;
+        }
+    </style>
+    
+    <link rel="stylesheet" type="text/css" href="../css_files/dropdowns-enhancement.css">
+     <link href="http://getbootstrap.com/2.3.2/assets/css/bootstrap.css" rel="stylesheet">
+    <link href="http://getbootstrap.com/2.3.2/assets/css/docs.css" rel="stylesheet">
+</head>
+
+<body>
+<div id= "buttonArea">  
+
+    <div class="btn-toolbar" style="margin: 0;">
+        <div class="btn-group">
+            <button data-toggle="dropdown" class="btn btn-primary dropdown-toggle" data-placeholder="Please select">
+                Countries <span class="caret"></span></button>
+            <ul class="dropdown-menu" style="height:300px;overflow:auto">
+                <li><input type="checkbox" id="1"  ><label for="1">European Union</label></li>
+                <li><input type="checkbox" id="2"  ><label for="2">Belgium</label></li>
+                <li><input type="checkbox" id="3"  ><label for="3">Bulgaria</label></li>
+                <li><input type="checkbox" id="4"  ><label for="4">Czech Republic</label></li>
+                <li><input type="checkbox" id="5"  ><label for="5">Denmark</label></li>
+                <li><input type="checkbox" id="6"  ><label for="6">Germany</label></li>
+                <li><input type="checkbox" id="7"  ><label for="7">Estonia</label></li>
+                <li><input type="checkbox" id="8"  ><label for="8">Ireland</label></li>
+                <li><input type="checkbox" id="9"  ><label for="9">Greece</label></li>
+                <li><input type="checkbox" id="10" ><label for="10">Spain</label></li>
+                <li><input type="checkbox" id="11" ><label for="11">France</label></li>
+                <li><input type="checkbox" id="12" ><label for="12">Italy</label></li>
+                <li><input type="checkbox" id="13" ><label for="13">Cyprus</label></li>
+                <li><input type="checkbox" id="14" ><label for="14">Latvia</label></li>
+                <li><input type="checkbox" id="15" ><label for="15">Lithuania</label></li>
+                <li><input type="checkbox" id="16" ><label for="16">Luxembourg</label></li>
+                <li><input type="checkbox" id="17" ><label for="17">Hungary</label></li>
+                <li><input type="checkbox" id="18" ><label for="18">Malta</label></li>
+                <li><input type="checkbox" id="19" ><label for="19">Netherlands</label></li>
+                <li><input type="checkbox" id="20" ><label for="20">Austria</label></li>
+                <li><input type="checkbox" id="21" ><label for="21">Poland</label></li>
+                <li><input type="checkbox" id="22" ><label for="22">Portugal</label></li>
+                <li><input type="checkbox" id="23" ><label for="23">Romania</label></li>
+                <li><input type="checkbox" id="24" ><label for="24">Slovenia</label></li>
+                <li><input type="checkbox" id="25" ><label for="25">Slovakia</label></li>
+                <li><input type="checkbox" id="26" ><label for="26">Finland</label></li>
+                <li><input type="checkbox" id="27" ><label for="27">Sweden</label></li>
+                <li><input type="checkbox" id="28" ><label for="28">United Kingdom</label></li>
+                <li><input type="checkbox" id="29" ><label for="29">Iceland</label></li>
+                <li><input type="checkbox" id="30" ><label for="30">Norway</label></li>
+                <li><input type="checkbox" id="31" ><label for="31">Switzerland</label></li>
+                <li><input type="checkbox" id="32" ><label for="32">Turkey</label></li>
+
+            </ul>
+        </div>
+  
+
+    </div>
+</div>
+
+<script src="http://code.jquery.com/jquery-2.1.3.min.js"></script>
+<script src="../js_files/d3.js"></script>
+<script src="../js_files/bootstrap.js"></script>
+<script src="../js_files/dropdowns-enhancement.js"></script>
+<script>
+var newCountryData = [];
+var countryNames = ["European Union", "Belgium", "Bulgaria", "Czech Republic", "Denmark", "Germany", "Estonia", "Ireland", "Greece", "Spain", "France", "Italy", "Cyprus", "Latvia", "Lithuania", "Luxembourg", "Hungary", "Malta", "Netherlands", "Austria", "Poland", "Portugal", "Romania", "Slovenia", "Slovakia", "Finland", "Sweden", "United Kingdom", "Iceland", "Norway", "Switzerland", "Turkey"];
+$('.dropdown-menu input[type=checkbox]').click(function(){
+    // code goes herethis
+    if (this.checked == true) {
+        document.getElementById("line" + (parseInt(this.id)-1).toString()).removeAttribute("class", "lines");
+    }
+    else{
+        document.getElementById("line" + (parseInt(this.id)-1).toString()).setAttribute("class", "lines");
+    }
+});
+var parseDate = d3.time.format("%Y-%b").parse;
+var color = d3.scale.category40().domain(d3.range(0,40));
+var margin = {top: 20, right: 20, bottom: 30, left: 50},
+    width = 960 - margin.left - margin.right,
+    height = 500 - margin.top - margin.bottom;
+
+var x = d3.time.scale().range([0, width]);
+var y = d3.scale.linear().range([height, 0]);
+var xAxis = d3.svg.axis().scale(x).orient("bottom");
+var yAxis = d3.svg.axis().scale(y).orient("left");
+
+var line = d3.svg.line().interpolate("linear")
+    .x(function(d) { return x(d.TIME); })
+    .y(function(d) { return y(d.Value); });
+
+var svg = d3.select("body").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+    .attr("transform", "translate(" + margin.left + "," +margin.top + ")");
+
+d3.csv("../data/prc_hicp_mmor_Data.csv", function(error, data) {
+    var temp = [];
+    var nameCounter = 0;
+    var count = 0;
+    data.forEach(function(d) {
+        d.TIME = parseDate(d.TIME);
+        d.Value = +d.Value;
+        d.GEO = d.GEO;
+        count++;
+        if (d.GEO == countryNames[nameCounter]) {
+            temp.push(d)
+        }
+        else {
+            newCountryData.push(temp);
+            temp = []
+            nameCounter++;
+        }
+        if (count == data.length-1) {
+            newCountryData.push(temp);
+        };
+    });
+
+    x.domain(d3.extent(data, function(d) { return d.TIME; }));
+    y.domain([-3.5,4]);
+
+    svg.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + height + ")")
+      .call(xAxis);
+
+    svg.append("g")
+        .attr("class", "y axis")
+        .call(yAxis)
+        .append("text")
+        .attr("transform", "rotate(-90)")
+        .attr("y", 6)
+        .attr("dy", ".71em")
+        .style("text-anchor", "end")
+        .text("Price ($)");
+
+        for (var j = 0;j < newCountryData.length;j++){
+                svg.append("path")
+                    .attr("class","lines")
+                    .attr("id", "line" + j)
+                    .attr("stroke", color(j))
+                    .attr('fill',"none" )
+                    .attr("d", line(newCountryData[j]));
+                }
+});
+
+</script>
+</body>
