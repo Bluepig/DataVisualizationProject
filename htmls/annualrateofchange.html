@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<head>
+    <style>
+        body {
+            position: relative;
+            width: 960px;
+        }
+
+        .axis text {
+            font: 10px sans-serif;
+        }
+
+        .axis path,
+        .axis line {
+            fill: none;
+            stroke: #000;
+            shape-rendering: crispEdges;
+        }
+
+        .bar {
+            fill: steelblue;
+            fill-opacity: .9;
+        }
+
+        .x.axis path {
+            display: none;
+        }
+
+        #label1 {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+        
+        #buttonArea{
+            width: 200px;
+            height: 500px;
+            position: absolute;
+            left: 1000px;
+        }
+    </style>
+    
+    <link rel="stylesheet" type="text/css" href="../css_files/dropdowns-enhancement.css">
+    <link href="http://getbootstrap.com/2.3.2/assets/css/bootstrap.css" rel="stylesheet">
+    <link href="http://getbootstrap.com/2.3.2/assets/css/docs.css" rel="stylesheet">
+
+    <script src="http://code.jquery.com/jquery-2.1.3.min.js"></script>
+    <script src="../js_files/bootstrap.js"></script>
+    <script src="../js_files/d3.js"></script>
+</head>
+
+<body>
+<!-- draw the checkbox for selecting the year -->
+    <div id= "buttonArea"> 
+        <div class="btn-toolbar form-inline" style="margin: 0;">
+        <div class="btn-group">
+            <button data-toggle="dropdown" class="btn dropdown-toggle">Choose Year<span class="caret"></span></button>
+            <ul class="dropdown-menu">
+                <li><input type="radio" id="year-2005" name="junk"  checked><label for="year-2005">2005</label>
+                </li>
+                <li><input type="radio" id="year-2006" name="junk"  ><label for="year-2006">2006</label></li>
+                <li><input type="radio" id="year-2007" name="junk"  ><label for="year-2007">2007</label></li>
+                <li><input type="radio" id="year-2008" name="junk"  ><label for="year-2008">2008</label></li>
+                <li><input type="radio" id="year-2009" name="junk"  ><label for="year-2009">2009</label></li>
+                <li><input type="radio" id="year-2010" name="junk"  ><label for="year-2010">2010</label></li>
+                <li><input type="radio" id="year-2011" name="junk"  ><label for="year-2011">2011</label></li>
+                <li><input type="radio" id="year-2012" name="junk"  ><label for="year-2012">2012</label></li>
+                <li><input type="radio" id="year-2013" name="junk"  ><label for="year-2013">2013</label></li>
+                <li><input type="radio" id="year-2014" name="junk"  ><label for="year-2014">2014</label></li>
+            </ul>
+        </div>
+        </div> 
+    </div>
+    <label id="label1"><input type="checkbox" id = "checkbox1">Sort</label>
+
+
+<script>
+// bind the updateData function to the buttons
+    $('.dropdown-menu input[type=radio]').click(function(){
+        if (this.checked == true ) {
+            updateData(parseInt(this.id.substring(5)));
+        }
+    });
+// definition of the updateData function
+    function updateData(year){
+        // remove the label text and recs each time
+        svg.selectAll(".bar")  
+            .remove("rect") ;
+        d3.select(".x.axis")
+            .call(xAxis)
+            .remove("text");
+        // import the right data according to the year 
+        d3.csv("../data/annual.csv", function(error, data) {
+            svg.selectAll(".bar")
+                .data(newAnnualData[year-2005])
+                .enter().append("rect")
+                .attr("class", "bar")
+                .attr("x", function(d) { return x(d.GEO); })
+                .attr("width", x.rangeBand())
+                .attr("y", function(d) { return y(d.Value); })
+                .attr("height", function(d) { return height - y(d.Value); });
+            
+            svg.append("g")
+                .attr("class", "x axis")
+                .attr("transform", "translate(0," + height + ")")
+                .call(xAxis)
+                .selectAll("text")
+                .attr('x', -30)
+                .attr("transform", "rotate(-45)");
+
+            d3.select("#checkbox1").on("change", change);
+            data = newAnnualData[year-2005];
+ 
+            function change() {
+                var x0 = x.domain(data.sort(this.checked
+                ? function(a, b) { return  b.Value - a.Value; }
+                : function(a, b) { return d3.ascending(a.GEO, b.GEO); })
+                .map(function(d) { return d.GEO; }))
+                .copy();
+            
+                var transition = svg.transition().duration(100),
+                delay = function(d, i) { return i * 30; };
+
+                transition.selectAll(".bar")
+                    .delay(delay)
+                    .attr("x", function(d) { return x0(d.GEO); });
+
+                transition.select(".x.axis")
+                    .call(xAxis)
+                    .selectAll("text")
+                    .attr('x', -30)
+                    .selectAll("g")
+                    .delay(delay);
+            }
+        });
+    }
+// initialize the axis and the datasets
+d3.csv("../data/annual.csv", function(error, data) {
+    data.forEach(function(d) {
+        d.Value = +d.Value;
+        d.GEO = d.GEO;
+        d.TIME = +d.TIME;
+        switch(d.TIME){
+            case 2005:
+                newAnnualData[0].push(d);
+                break;
+            case 2006:
+                newAnnualData[1].push(d);
+                break;
+            case 2007:
+                newAnnualData[2].push(d);
+                break;
+            case 2008:
+                newAnnualData[3].push(d);
+                break;
+            case 2009:
+                newAnnualData[4].push(d);
+                break;
+            case 2010:
+                newAnnualData[5].push(d);
+                break;
+            case 2011:
+                newAnnualData[6].push(d);
+                break;
+            case 2012:
+                newAnnualData[7].push(d);
+                break;
+            case 2013:
+                newAnnualData[8].push(d);
+                break;
+            case 2014:
+                newAnnualData[9].push(d);
+                break; 
+
+        }
+    });
+    x.domain(data.map(function(d) { return d.GEO; }));
+    y.domain([0, d3.max(data, function(d) { return d.Value; })]);
+    svg.append("g")
+        .attr("class", "y axis")
+        .call(yAxis)
+        .append("text")
+        .attr("transform", "rotate(-90)")
+        .attr("y", 6)
+        .attr("dy", ".71em")
+        .style("text-anchor", "end")
+        .text("Value");
+          svg.append("g")
+        .attr("class", "x axis")
+        .attr("transform", "translate(0," + height + ")")
+        .call(xAxis)
+        .selectAll("text")
+        .attr('x', -30)
+        .attr("transform", "rotate(-45)");
+    });
+
+    var margin = {top: 20, right: 20, bottom: 30, left: 40},
+        width = 960 - margin.left - margin.right,
+        height = 500 - margin.top - margin.bottom;
+
+    var formatPercent = d3.format(".0%");
+
+    var x = d3.scale.ordinal()
+        .rangeRoundBands([0, width], .1, 1);
+
+    var y = d3.scale.linear()
+        .range([height, 0]);
+
+    var xAxis = d3.svg.axis()
+        .scale(x)
+        .orient("bottom");
+
+    var yAxis = d3.svg.axis()
+        .scale(y)
+        .orient("left");
+
+    var svg = d3.select("body").append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", 600 + margin.top + margin.bottom)
+        .append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    var newAnnualData = [[],[],[],[],[],[],[],[],[],[]];
+</script>
+</body>
