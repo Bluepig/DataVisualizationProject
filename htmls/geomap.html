@@ -40,7 +40,7 @@ var path = d3.geo.path()
 var g = svg.append("g");
 var colorScale ;
 var tempcolor;
-d3.json("../data_files/europegeo.json", function(json) {
+d3.json("../data/europegeo.json", function(json) {
                 //Bind data and create one path per GeoJSON feature
                 g=g.selectAll("path")
                    .data(json.features)
@@ -48,8 +48,8 @@ d3.json("../data_files/europegeo.json", function(json) {
                    .append("path")
                    .attr("d", path)
                    .attr("class", "country")
-                   .attr("transform", "translate(0,50)")
-                   .style("fill", function(d,i){
+                   .attr("transform", "translate(0,50)");
+                   g.style("fill", function(d,i){
                    	if(i<32)
                    	return colorScale(tempcolor[i].value);
                     })
@@ -61,7 +61,7 @@ d3.json("../data_files/europegeo.json", function(json) {
                     });                               
             });
 		
- d3.csv("../data_files/hicp_midx_2014.csv", function(error, data) {
+ d3.csv("../data/hicp_midx_2014.csv", function(error, data) {
  		var sort = d3.nest()
                  .key(function(d) { return d.TIME; })
                  .entries(data);
@@ -107,6 +107,7 @@ d3.json("../data_files/europegeo.json", function(json) {
      function menuChanged() { 
               var selectedIndex = d3.event.target.selectedIndex;             
               console.log(sort[selectedIndex].values);
+
               g.data(sort[selectedIndex].values)
                .style("fill", function(d) { return colorScale(d.value); })
                .text(function(d) { return d.GEO; });
@@ -114,7 +115,6 @@ d3.json("../data_files/europegeo.json", function(json) {
                .text(function(d) { return "Country: " + d.GEO + "\nValue    : " + d.value; });
             }           
  });
-
 </script>
 </body>
 </html>

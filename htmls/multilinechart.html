@@ -128,6 +128,7 @@ d3.csv("../data/prc_hicp_mmor_Data.csv", function(error, data) {
     var temp = [];
     var nameCounter = 0;
     var count = 0;
+    // create a new array according to the country names
     data.forEach(function(d) {
         d.TIME = parseDate(d.TIME);
         d.Value = +d.Value;
